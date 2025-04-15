@@ -84,8 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showFeedback(isCorrect, correctAnswer) {
-        feedbackEl.classList.remove('hidden', 'correct', 'incorrect');
+        feedbackEl.classList.remove('correct', 'incorrect', 'show');
         feedbackEl.classList.add(isCorrect ? 'correct' : 'incorrect');
+        feedbackEl.classList.remove('hidden');
         
         feedbackMessageEl.textContent = isCorrect 
             ? '答對了！👏' 
@@ -95,9 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ? '' 
             : `正確答案是：${correctAnswer}`;
         
+        // Show feedback with slight delay for the animation
+        setTimeout(() => {
+            feedbackEl.classList.add('show');
+        }, 10);
+        
         // Automatically hide feedback after a short delay
         setTimeout(() => {
-            feedbackEl.classList.add('hidden');
+            feedbackEl.classList.remove('show');
+            // Add a transition end listener to add the hidden class after animation completes
+            const transitionEnd = () => {
+                feedbackEl.classList.add('hidden');
+                feedbackEl.removeEventListener('transitionend', transitionEnd);
+            };
+            feedbackEl.addEventListener('transitionend', transitionEnd);
         }, isCorrect ? 1000 : 2000);
     }
     
@@ -150,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
         resultScreen.classList.add('hidden');
+        feedbackEl.classList.remove('show');
         feedbackEl.classList.add('hidden');
         
         startTimer();

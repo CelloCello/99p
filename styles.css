@@ -136,6 +136,13 @@ select {
     display: none;
 }
 
+/* Special case for feedback to allow for transitions */
+.feedback.hidden {
+    display: block;
+    transform: translateY(-100%);
+    visibility: hidden;
+}
+
 /* Game Screen */
 .stats {
     display: flex;
@@ -184,11 +191,24 @@ input[type="number"]:focus {
 }
 
 .feedback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     background-color: #f8f8f8;
     padding: 15px;
-    border-radius: 12px;
-    margin-top: 20px;
-    animation: fadeIn 0.5s;
+    z-index: 100;
+    border-radius: 12px 12px 12px 12px;
+    border-top: 3px solid;
+    border-bottom: 3px solid;
+    border-right: 3px solid;
+    border-left: 3px solid;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-out;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 #feedback-message {
@@ -203,12 +223,16 @@ input[type="number"]:focus {
 
 .feedback.correct {
     background-color: #e7ffe7;
-    border: 2px solid #a3e0a3;
+    border-color: #a3e0a3;
 }
 
 .feedback.incorrect {
     background-color: #ffe7e7;
-    border: 2px solid #e0a3a3;
+    border-color: #e0a3a3;
+}
+
+.feedback.show {
+    transform: translateY(10%);
 }
 
 /* Result Screen */
