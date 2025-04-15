@@ -111,6 +111,7 @@ select {
     font-family: inherit;
     position: relative;
     overflow: hidden;
+    margin: 5px;
 }
 
 .btn:hover {
@@ -130,6 +131,22 @@ select {
 
 #retry-btn:hover {
     background-color: #ff9642;
+}
+
+.history-btn {
+    background-color: #8cc6fc;
+}
+
+.history-btn:hover {
+    background-color: #6fb2f5;
+}
+
+.clear-btn {
+    background-color: #ff7bab;
+}
+
+.clear-btn:hover {
+    background-color: #ff5a95;
 }
 
 .hidden {
@@ -250,6 +267,7 @@ input[type="number"]:focus {
     display: flex;
     justify-content: space-between;
     padding: 5px 15px;
+    align-items: center;
 }
 
 .result-item:not(:last-child) {
@@ -260,6 +278,97 @@ input[type="number"]:focus {
 #result-accuracy, #result-time {
     font-weight: bold;
     color: #ff7bab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* History Screen */
+.history-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding-right: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #8cc6fc #f1f9ff;
+}
+
+.history-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.history-container::-webkit-scrollbar-track {
+    background: #f1f9ff;
+    border-radius: 10px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background-color: #8cc6fc;
+    border-radius: 10px;
+}
+
+.history-item {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    text-align: left;
+    border-left: 4px solid #8cc6fc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    animation: fadeIn 0.4s;
+}
+
+.history-number {
+    background-color: #8cc6fc;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.history-content {
+    flex-grow: 1;
+}
+
+.history-date {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.history-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 15px;
+}
+
+.history-details span {
+    font-size: 0.95rem;
+    background-color: #f1f9ff;
+    padding: 3px 8px;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.empty-history {
+    text-align: center;
+    padding: 30px 0;
+    color: #999;
+    font-style: italic;
+}
+
+.history-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 /* Animations */
@@ -300,4 +409,117 @@ input[type="number"]:focus {
     .result-item {
         font-size: 1.1rem;
     }
+    
+    .history-item {
+        padding: 12px;
+    }
+    
+    .history-details {
+        font-size: 0.9rem;
+    }
+}
+
+/* Progress indicators for history */
+.progress-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-left: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.progress-indicator.improved {
+    background-color: #a3e0a3;
+    color: #207020;
+}
+
+.progress-indicator.declined {
+    background-color: #e0a3a3;
+    color: #702020;
+}
+
+.progress-indicator.same {
+    background-color: #e0e0a3;
+    color: #707020;
+}
+
+.history-accuracy, .history-time {
+    display: flex;
+    align-items: center;
+}
+
+/* Trend summary */
+.trend-summary {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px dashed #8cc6fc;
+    text-align: left;
+}
+
+.trend-summary h3 {
+    color: #5aa9fc;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.trend-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.trend {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.trend.improved {
+    background-color: rgba(163, 224, 163, 0.3);
+    color: #207020;
+}
+
+.trend.declined {
+    background-color: rgba(224, 163, 163, 0.3);
+    color: #702020;
+}
+
+.trend.same {
+    background-color: rgba(224, 224, 163, 0.3);
+    color: #707020;
+}
+
+.indicators-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 15px;
+    background-color: #f1f9ff;
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px dashed #8cc6fc;
+}
+
+.indicators-note p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.indicators-note .progress-indicator {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+}
+
+/* Replace with additional styling for the trend summary on the result screen */
+#result-trend-summary {
+    margin: 0 0 20px 0;
 } 

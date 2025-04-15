@@ -23,7 +23,18 @@
                         <option value="20">20題</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="history-limit">紀錄保存筆數：</label>
+                    <select id="history-limit">
+                        <option value="10">10筆</option>
+                        <option value="20">20筆</option>
+                        <option value="30" selected>30筆</option>
+                        <option value="50">50筆</option>
+                        <option value="100">100筆</option>
+                    </select>
+                </div>
                 <button id="start-btn" class="btn">開始練習</button>
+                <button id="view-history-btn" class="btn history-btn">查看紀錄</button>
             </div>
         </div>
         
@@ -56,7 +67,22 @@
                 <div class="result-item">正確率：<span id="result-accuracy">0%</span></div>
                 <div class="result-item">花費時間：<span id="result-time">00:00</span></div>
             </div>
+            <div class="trend-summary" id="result-trend-summary">
+                <!-- Trend summary will be added dynamically here -->
+            </div>
             <button id="retry-btn" class="btn">再來一次</button>
+            <button id="view-history-btn-result" class="btn history-btn">查看紀錄</button>
+        </div>
+
+        <div id="history-screen" class="hidden">
+            <h2>練習紀錄</h2>
+            <div id="history-container" class="history-container">
+                <!-- History items will be dynamically generated here -->
+            </div>
+            <div class="history-controls">
+                <button id="back-to-home-btn" class="btn">返回首頁</button>
+                <button id="clear-history-btn" class="btn clear-btn">清除紀錄</button>
+            </div>
         </div>
     </div>
     
