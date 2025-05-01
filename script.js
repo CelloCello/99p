@@ -16,9 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToHomeBtn = document.getElementById('back-to-home-btn');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     
-    const normalModeDesc = document.getElementById('normal-mode-desc');
-    const advancedModeDesc = document.getElementById('advanced-mode-desc');
-    
     const currentQuestionEl = document.getElementById('current-question');
     const totalQuestionsEl = document.getElementById('total-questions');
     const timerEl = document.getElementById('timer');
@@ -62,17 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         historyLimit: 30,
         currentAnswer: null
     };
-    
-    // Function to toggle mode descriptions
-    function updateModeDescription() {
-        if (gameModeSelect.value === 'normal') {
-            normalModeDesc.classList.remove('hidden');
-            advancedModeDesc.classList.add('hidden');
-        } else {
-            normalModeDesc.classList.add('hidden');
-            advancedModeDesc.classList.remove('hidden');
-        }
-    }
     
     // Utility functions
     function formatTime(seconds) {
@@ -656,8 +642,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    gameModeSelect.addEventListener('change', updateModeDescription);
-    
     retryBtn.addEventListener('click', resetGame);
     viewHistoryBtn.addEventListener('click', showHistory);
     viewHistoryBtnResult.addEventListener('click', showHistory);
@@ -687,5 +671,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize
     loadSettings();
-    updateModeDescription();
 }); 
