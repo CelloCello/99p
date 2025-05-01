@@ -227,18 +227,10 @@ input[type="number"]:focus {
 
 /* New feedback styles in question area */
 .question-container.correct-answer {
-    background-color: rgba(163, 224, 163, 0.2);
-    border-radius: 15px;
-    padding: 10px;
-    border: 2px solid #a3e0a3;
     animation: pulse 0.5s;
 }
 
 .question-container.incorrect-answer {
-    background-color: rgba(224, 163, 163, 0.2);
-    border-radius: 15px;
-    padding: 10px;
-    border: 2px solid #e0a3a3;
     animation: pulse 0.5s;
 }
 
