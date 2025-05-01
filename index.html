@@ -15,6 +15,13 @@
             <div class="setup-form">
                 <h2>請選擇練習設定</h2>
                 <div class="form-group">
+                    <label for="game-mode">遊戲模式：</label>
+                    <select id="game-mode">
+                        <option value="normal" selected>一般模式</option>
+                        <option value="advanced">進階模式</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="question-count">題目數量：</label>
                     <select id="question-count">
                         <option value="5">5題</option>
@@ -33,6 +40,14 @@
                         <option value="100">100筆</option>
                     </select>
                 </div>
+                <div class="mode-description">
+                    <p id="normal-mode-desc" class="mode-desc">一般模式：顯示 2 × 3 = ? 讓你回答結果</p>
+                    <p id="advanced-mode-desc" class="mode-desc hidden">進階模式：隨機出現三種題型
+                        <br>- 題型一：2 × 3 = ?（計算結果）
+                        <br>- 題型二：2 × ? = 6（求乘數）
+                        <br>- 題型三：? × 3 = 6（求被乘數）
+                    </p>
+                </div>
                 <button id="start-btn" class="btn">開始練習</button>
                 <button id="view-history-btn" class="btn history-btn">查看紀錄</button>
             </div>
@@ -46,7 +61,7 @@
             
             <div class="question-container">
                 <div class="question">
-                    <span id="num1">?</span> × <span id="num2">?</span> = ?
+                    <span id="num1">?</span> × <span id="num2">?</span> = <span id="result">?</span>
                 </div>
                 <input type="number" id="answer-input" placeholder="請輸入答案">
                 <button id="submit-btn" class="btn">確認</button>
@@ -61,6 +76,7 @@
         <div id="result-screen" class="hidden">
             <h2>練習結果</h2>
             <div class="result-stats">
+                <div class="result-item">模式：<span id="result-mode">一般模式</span></div>
                 <div class="result-item">總題數：<span id="result-total">0</span></div>
                 <div class="result-item">正確數：<span id="result-correct">0</span></div>
                 <div class="result-item">錯誤數：<span id="result-incorrect">0</span></div>
@@ -76,6 +92,11 @@
 
         <div id="history-screen" class="hidden">
             <h2>練習紀錄</h2>
+            <div class="mode-tabs">
+                <button id="all-mode-tab" class="mode-tab active">全部</button>
+                <button id="normal-mode-tab" class="mode-tab">一般模式</button>
+                <button id="advanced-mode-tab" class="mode-tab">進階模式</button>
+            </div>
             <div id="history-container" class="history-container">
                 <!-- History items will be dynamically generated here -->
             </div>

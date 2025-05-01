@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultScreen = document.getElementById('result-screen');
     const historyScreen = document.getElementById('history-screen');
     
+    const gameModeSelect = document.getElementById('game-mode');
     const questionCountSelect = document.getElementById('question-count');
     const historyLimitSelect = document.getElementById('history-limit');
     const startBtn = document.getElementById('start-btn');
@@ -15,18 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToHomeBtn = document.getElementById('back-to-home-btn');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     
+    const normalModeDesc = document.getElementById('normal-mode-desc');
+    const advancedModeDesc = document.getElementById('advanced-mode-desc');
+    
     const currentQuestionEl = document.getElementById('current-question');
     const totalQuestionsEl = document.getElementById('total-questions');
     const timerEl = document.getElementById('timer');
     
     const num1El = document.getElementById('num1');
     const num2El = document.getElementById('num2');
+    const resultEl = document.getElementById('result');
     const answerInput = document.getElementById('answer-input');
     
     const feedbackEl = document.getElementById('feedback');
     const feedbackMessageEl = document.getElementById('feedback-message');
     const correctAnswerEl = document.getElementById('correct-answer');
     
+    const resultModeEl = document.getElementById('result-mode');
     const resultTotalEl = document.getElementById('result-total');
     const resultCorrectEl = document.getElementById('result-correct');
     const resultIncorrectEl = document.getElementById('result-incorrect');
@@ -34,8 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultTimeEl = document.getElementById('result-time');
     const historyContainerEl = document.getElementById('history-container');
     
+    // Mode tabs for history
+    const allModeTab = document.getElementById('all-mode-tab');
+    const normalModeTab = document.getElementById('normal-mode-tab');
+    const advancedModeTab = document.getElementById('advanced-mode-tab');
+    
     // Game state
     let gameState = {
+        mode: 'normal', // 'normal' or 'advanced'
         questionCount: 10,
         currentQuestion: 0,
         correctAnswers: 0,
@@ -45,8 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
         timerInterval: null,
         currentNum1: null,
         currentNum2: null,
-        historyLimit: 30
+        currentResult: null,
+        currentQuestionType: null, // 'normal', 'findNum2', or 'findNum1'
+        historyLimit: 30,
+        currentAnswer: null
     };
+    
+    // Function to toggle mode descriptions
+    function updateModeDescription() {
+        if (gameModeSelect.value === 'normal') {
+            normalModeDesc.classList.remove('hidden');
+            advancedModeDesc.classList.add('hidden');
+        } else {
+            normalModeDesc.classList.add('hidden');
+            advancedModeDesc.classList.remove('hidden');
+        }
+    }
     
     // Utility functions
     function formatTime(seconds) {
@@ -60,12 +86,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function generateQuestion() {
-        // Generate random numbers between 1 and 9 for 9x9 multiplication table
-        gameState.currentNum1 = getRandomNumber(1, 9);
-        gameState.currentNum2 = getRandomNumber(1, 9);
+        // Reset the UI elements first
+        num1El.textContent = '?';
+        num2El.textContent = '?';
+        resultEl.textContent = '?';
         
-        num1El.textContent = gameState.currentNum1;
-        num2El.textContent = gameState.currentNum2;
+        if (gameState.mode === 'normal') {
+            // Normal mode: 2 x 3 = ?
+            gameState.currentQuestionType = 'normal';
+            gameState.currentNum1 = getRandomNumber(1, 9);
+            gameState.currentNum2 = getRandomNumber(1, 9);
+            gameState.currentResult = gameState.currentNum1 * gameState.currentNum2;
+            gameState.currentAnswer = gameState.currentResult;
+            
+            num1El.textContent = gameState.currentNum1;
+            num2El.textContent = gameState.currentNum2;
+            resultEl.textContent = '?';
+        } else {
+            // Advanced mode: randomly pick between 3 question types
+            const questionType = Math.random() < 0.33 ? 'normal' : Math.random() < 0.5 ? 'findNum2' : 'findNum1';
+            gameState.currentQuestionType = questionType;
+            
+            gameState.currentNum1 = getRandomNumber(1, 9);
+            gameState.currentNum2 = getRandomNumber(1, 9);
+            gameState.currentResult = gameState.currentNum1 * gameState.currentNum2;
+            
+            if (questionType === 'normal') {
+                // 2 x 3 = ?
+                num1El.textContent = gameState.currentNum1;
+                num2El.textContent = gameState.currentNum2;
+                resultEl.textContent = '?';
+                gameState.currentAnswer = gameState.currentResult;
+            } else if (questionType === 'findNum2') {
+                // 2 x ? = 6
+                num1El.textContent = gameState.currentNum1;
+                num2El.textContent = '?';
+                resultEl.textContent = gameState.currentResult;
+                gameState.currentAnswer = gameState.currentNum2;
+            } else {
+                // ? x 3 = 6
+                num1El.textContent = '?';
+                num2El.textContent = gameState.currentNum2;
+                resultEl.textContent = gameState.currentResult;
+                gameState.currentAnswer = gameState.currentNum1;
+            }
+        }
         
         answerInput.value = '';
         answerInput.focus();
@@ -123,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function checkAnswer() {
         const userAnswer = parseInt(answerInput.value, 10);
-        const correctAnswer = gameState.currentNum1 * gameState.currentNum2;
+        const correctAnswer = gameState.currentAnswer;
         
         const isCorrect = userAnswer === correctAnswer;
         
@@ -146,13 +211,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // History functions
-    function loadHistoryFromStorage() {
-        const storedHistory = localStorage.getItem('practiceHistory');
+    function getHistoryKey() {
+        return `practiceHistory_${gameState.mode}`;
+    }
+    
+    function loadHistoryFromStorage(mode = null) {
+        const historyKey = mode ? `practiceHistory_${mode}` : getHistoryKey();
+        const storedHistory = localStorage.getItem(historyKey);
         return storedHistory ? JSON.parse(storedHistory) : [];
     }
     
-    function saveHistoryToStorage(history) {
-        localStorage.setItem('practiceHistory', JSON.stringify(history));
+    function loadAllHistoryFromStorage() {
+        const normalHistory = loadHistoryFromStorage('normal');
+        const advancedHistory = loadHistoryFromStorage('advanced');
+        
+        // Combine and sort by date (newest first)
+        const combinedHistory = [...normalHistory, ...advancedHistory].sort((a, b) => {
+            return new Date(b.date) - new Date(a.date);
+        });
+        
+        return combinedHistory;
+    }
+    
+    function saveHistoryToStorage(history, mode = null) {
+        const historyKey = mode ? `practiceHistory_${mode}` : getHistoryKey();
+        localStorage.setItem(historyKey, JSON.stringify(history));
     }
     
     function addResultToHistory(result) {
@@ -168,13 +251,28 @@ document.addEventListener('DOMContentLoaded', () => {
         saveHistoryToStorage(history);
     }
     
-    function clearHistory() {
-        localStorage.removeItem('practiceHistory');
+    function clearHistory(mode = null) {
+        if (mode === 'all') {
+            localStorage.removeItem('practiceHistory_normal');
+            localStorage.removeItem('practiceHistory_advanced');
+        } else if (mode) {
+            localStorage.removeItem(`practiceHistory_${mode}`);
+        } else {
+            localStorage.removeItem(getHistoryKey());
+        }
+        
         displayHistory(); // Refresh the empty history display
     }
     
-    function displayHistory() {
-        const history = loadHistoryFromStorage();
+    function displayHistory(mode = 'all') {
+        let history;
+        
+        if (mode === 'all') {
+            history = loadAllHistoryFromStorage();
+        } else {
+            history = loadHistoryFromStorage(mode);
+        }
+        
         historyContainerEl.innerHTML = '';
         
         if (history.length === 0) {
@@ -185,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Add trend summary if we have more than one record
-        if (history.length > 1) {
+        // Add trend summary if we have more than one record and not in 'all' mode
+        if (history.length > 1 && mode !== 'all') {
             const trendSummary = document.createElement('div');
             trendSummary.className = 'trend-summary';
             
@@ -232,11 +330,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
             
-            // Compare with previous entry for progress indicators
+            // Compare with previous entry for progress indicators if they are of the same mode
             let accuracyProgress = '';
             let timeProgress = '';
             
-            if (index < history.length - 1) {
+            if (mode !== 'all' && index < history.length - 1) {
                 // Compare accuracy
                 const prevAccuracy = history[index + 1].accuracy;
                 const currentAccuracy = entry.accuracy;
@@ -274,11 +372,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const historyDate = new Date(entry.date);
             const formattedDate = `${historyDate.getFullYear()}/${(historyDate.getMonth() + 1).toString().padStart(2, '0')}/${historyDate.getDate().toString().padStart(2, '0')} ${historyDate.getHours().toString().padStart(2, '0')}:${historyDate.getMinutes().toString().padStart(2, '0')}`;
             
+            const modeText = entry.mode === 'normal' ? '一般模式' : '進階模式';
+            
             historyItem.innerHTML = `
                 <div class="history-number">#${index + 1}</div>
                 <div class="history-content">
                     <div class="history-date">${formattedDate}</div>
                     <div class="history-details">
+                        <span>模式: ${modeText}</span>
                         <span>題數: ${entry.questionCount}</span>
                         <span>正確: ${entry.correctAnswers}</span>
                         <span>錯誤: ${entry.incorrectAnswers}</span>
@@ -318,13 +419,33 @@ document.addEventListener('DOMContentLoaded', () => {
         resultScreen.classList.add('hidden');
         historyScreen.classList.remove('hidden');
         
-        displayHistory();
+        // Set active tab
+        setActiveHistoryTab('all');
+        displayHistory('all');
+    }
+    
+    function setActiveHistoryTab(mode) {
+        // Remove active class from all tabs
+        allModeTab.classList.remove('active');
+        normalModeTab.classList.remove('active');
+        advancedModeTab.classList.remove('active');
+        
+        // Add active class to the selected tab
+        if (mode === 'all') {
+            allModeTab.classList.add('active');
+        } else if (mode === 'normal') {
+            normalModeTab.classList.add('active');
+        } else if (mode === 'advanced') {
+            advancedModeTab.classList.add('active');
+        }
     }
     
     function showResults() {
         const totalTime = stopTimer();
         const accuracy = Math.round((gameState.correctAnswers / gameState.questionCount) * 100);
         
+        // Update result display
+        resultModeEl.textContent = gameState.mode === 'normal' ? '一般模式' : '進階模式';
         resultTotalEl.textContent = gameState.questionCount;
         resultCorrectEl.textContent = gameState.correctAnswers;
         resultIncorrectEl.textContent = gameState.incorrectAnswers;
@@ -332,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save result to history
         const result = {
             date: gameState.startTime.toISOString(),
+            mode: gameState.mode,
             questionCount: gameState.questionCount,
             correctAnswers: gameState.correctAnswers,
             incorrectAnswers: gameState.incorrectAnswers,
@@ -347,11 +469,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resultTrendSummaryEl.innerHTML = '';
         
         if (history.length > 0) {
-            // Compare with the most recent previous entry
+            // Compare with the most recent previous entry of the same mode
             const prevResult = history[0];
             
-            // Only compare if questions count is the same
-            if (prevResult.questionCount === gameState.questionCount) {
+            // Only compare if mode and questions count are the same
+            if (prevResult.mode === gameState.mode && prevResult.questionCount === gameState.questionCount) {
                 // Compare accuracy
                 const prevAccuracy = prevResult.accuracy;
                 const accuracyDiff = accuracy - prevAccuracy;
@@ -428,6 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function startGame() {
+        gameState.mode = gameModeSelect.value;
         gameState.questionCount = parseInt(questionCountSelect.value, 10);
         gameState.historyLimit = parseInt(historyLimitSelect.value, 10);
         gameState.currentQuestion = 0;
@@ -457,18 +580,25 @@ document.addEventListener('DOMContentLoaded', () => {
         setupScreen.classList.remove('hidden');
     }
     
-    // Load history limit from localStorage if available
+    // Load settings from localStorage if available
     function loadSettings() {
         const savedHistoryLimit = localStorage.getItem('historyLimit');
         if (savedHistoryLimit) {
             gameState.historyLimit = parseInt(savedHistoryLimit, 10);
             historyLimitSelect.value = savedHistoryLimit;
         }
+        
+        const savedGameMode = localStorage.getItem('gameMode');
+        if (savedGameMode) {
+            gameState.mode = savedGameMode;
+            gameModeSelect.value = savedGameMode;
+        }
     }
     
-    // Save history limit to localStorage
+    // Save settings to localStorage
     function saveSettings() {
         localStorage.setItem('historyLimit', historyLimitSelect.value);
+        localStorage.setItem('gameMode', gameModeSelect.value);
     }
     
     // Event listeners
@@ -491,11 +621,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    gameModeSelect.addEventListener('change', updateModeDescription);
+    
     retryBtn.addEventListener('click', resetGame);
     viewHistoryBtn.addEventListener('click', showHistory);
     viewHistoryBtnResult.addEventListener('click', showHistory);
     backToHomeBtn.addEventListener('click', backToHome);
-    clearHistoryBtn.addEventListener('click', clearHistory);
+    clearHistoryBtn.addEventListener('click', () => clearHistory('all'));
+    
+    // Mode tab event listeners
+    allModeTab.addEventListener('click', () => {
+        setActiveHistoryTab('all');
+        displayHistory('all');
+    });
+    
+    normalModeTab.addEventListener('click', () => {
+        setActiveHistoryTab('normal');
+        displayHistory('normal');
+    });
+    
+    advancedModeTab.addEventListener('click', () => {
+        setActiveHistoryTab('advanced');
+        displayHistory('advanced');
+    });
     
     // Allow only numbers in input
     answerInput.addEventListener('input', function() {
@@ -504,4 +652,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize
     loadSettings();
+    updateModeDescription();
 }); 
