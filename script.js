@@ -25,10 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultEl = document.getElementById('result');
     const answerInput = document.getElementById('answer-input');
     
-    const feedbackEl = document.getElementById('feedback');
-    const feedbackMessageEl = document.getElementById('feedback-message');
-    const correctAnswerEl = document.getElementById('correct-answer');
-    
     const resultModeEl = document.getElementById('result-mode');
     const resultTotalEl = document.getElementById('result-total');
     const resultCorrectEl = document.getElementById('result-correct');
@@ -162,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return formatTime(totalSeconds);
     }
     
-    function showFeedback(isCorrect, correctAnswer) {
+    function showFeedback(isCorrect) {
         // Update the question area with the correct answer
         if (gameState.currentQuestionType === 'normal') {
             // If it was a normal question (2 x 3 = ?), update the result
@@ -214,20 +210,20 @@ document.addEventListener('DOMContentLoaded', () => {
             gameState.incorrectAnswers++;
         }
         
-        showFeedback(isCorrect, correctAnswer);
+        showFeedback(isCorrect);
         
         gameState.currentQuestion++;
         
         // Check if game is over
         if (gameState.currentQuestion >= gameState.questionCount) {
-            setTimeout(showResults, 1500);
+            setTimeout(showResults, 800);
         } else {
             setTimeout(() => {
                 // Re-enable input and button for the next question
                 answerInput.disabled = false;
                 submitBtn.disabled = false;
                 generateQuestion();
-            }, 1500);
+            }, 800);
         }
     }
     
@@ -584,8 +580,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.classList.remove('hidden');
         resultScreen.classList.add('hidden');
         historyScreen.classList.add('hidden');
-        feedbackEl.classList.remove('show');
-        feedbackEl.classList.add('hidden');
         
         startTimer();
         generateQuestion();

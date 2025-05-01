@@ -153,13 +153,6 @@ select {
     display: none;
 }
 
-/* Special case for feedback to allow for transitions */
-.feedback.hidden {
-    display: block;
-    transform: translateY(-100%);
-    visibility: hidden;
-}
-
 /* Game Screen */
 .stats {
     display: flex;
@@ -219,10 +212,6 @@ input[type="number"] {
 input[type="number"]:focus {
     outline: none;
     border-color: #ff7bab;
-}
-
-.feedback {
-    display: none;
 }
 
 /* New feedback styles in question area */
