@@ -67,7 +67,9 @@
                 <button id="submit-btn" class="btn">確認</button>
             </div>
             
-            <div class="feedback hidden" id="feedback">
+            <!-- We're keeping this element for backward compatibility with existing code, 
+                 but it won't be displayed anymore -->
+            <div class="feedback hidden" id="feedback" style="display: none;">
                 <div id="feedback-message"></div>
                 <div id="correct-answer"></div>
             </div>

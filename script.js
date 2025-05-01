@@ -91,6 +91,26 @@ document.addEventListener('DOMContentLoaded', () => {
         num2El.textContent = '?';
         resultEl.textContent = '?';
         
+        // Remove the revealed-answer class from all elements
+        num1El.classList.remove('revealed-answer');
+        num2El.classList.remove('revealed-answer');
+        resultEl.classList.remove('revealed-answer');
+        
+        // Remove any feedback styling from previous question
+        const questionContainer = document.querySelector('.question-container');
+        questionContainer.classList.remove('correct-answer', 'incorrect-answer');
+        
+        // Remove any existing feedback icon
+        const questionEl = document.querySelector('.question');
+        const existingIcon = questionEl.querySelector('.feedback-icon');
+        if (existingIcon) {
+            questionEl.removeChild(existingIcon);
+        }
+        
+        // Re-enable input and button
+        answerInput.disabled = false;
+        submitBtn.disabled = false;
+        
         if (gameState.mode === 'normal') {
             // Normal mode: 2 x 3 = ?
             gameState.currentQuestionType = 'normal';
@@ -157,33 +177,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showFeedback(isCorrect, correctAnswer) {
-        feedbackEl.classList.remove('correct', 'incorrect', 'show');
-        feedbackEl.classList.add(isCorrect ? 'correct' : 'incorrect');
-        feedbackEl.classList.remove('hidden');
+        // Update the question area with the correct answer
+        if (gameState.currentQuestionType === 'normal') {
+            // If it was a normal question (2 x 3 = ?), update the result
+            resultEl.textContent = gameState.currentResult;
+            resultEl.classList.add('revealed-answer');
+        } else if (gameState.currentQuestionType === 'findNum2') {
+            // If it was finding the second number (2 x ? = 6), update num2
+            num2El.textContent = gameState.currentNum2;
+            num2El.classList.add('revealed-answer');
+        } else {
+            // If it was finding the first number (? x 3 = 6), update num1
+            num1El.textContent = gameState.currentNum1;
+            num1El.classList.add('revealed-answer');
+        }
+
+        // Add feedback indicator to the question container
+        const questionContainer = document.querySelector('.question-container');
+        questionContainer.classList.remove('correct-answer', 'incorrect-answer');
+        questionContainer.classList.add(isCorrect ? 'correct-answer' : 'incorrect-answer');
+
+        // Add feedback icon next to the question
+        const questionEl = document.querySelector('.question');
+        const feedbackIcon = document.createElement('span');
+        feedbackIcon.className = `feedback-icon ${isCorrect ? 'correct' : 'incorrect'}`;
+        feedbackIcon.textContent = isCorrect ? '✓' : '✗';
         
-        feedbackMessageEl.textContent = isCorrect 
-            ? '答對了！👏' 
-            : '答錯了 😢';
+        // Remove any existing feedback icon first
+        const existingIcon = questionEl.querySelector('.feedback-icon');
+        if (existingIcon) {
+            questionEl.removeChild(existingIcon);
+        }
         
-        correctAnswerEl.textContent = isCorrect 
-            ? '' 
-            : `正確答案是：${correctAnswer}`;
+        questionEl.appendChild(feedbackIcon);
         
-        // Show feedback with slight delay for the animation
-        setTimeout(() => {
-            feedbackEl.classList.add('show');
-        }, 10);
-        
-        // Automatically hide feedback after a short delay
-        setTimeout(() => {
-            feedbackEl.classList.remove('show');
-            // Add a transition end listener to add the hidden class after animation completes
-            const transitionEnd = () => {
-                feedbackEl.classList.add('hidden');
-                feedbackEl.removeEventListener('transitionend', transitionEnd);
-            };
-            feedbackEl.addEventListener('transitionend', transitionEnd);
-        }, isCorrect ? 600 : 800);
+        // Disable the input and button temporarily
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
     }
     
     function checkAnswer() {
@@ -204,9 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Check if game is over
         if (gameState.currentQuestion >= gameState.questionCount) {
-            setTimeout(showResults, isCorrect ? 1200 : 1200);
+            setTimeout(showResults, 1500);
         } else {
-            setTimeout(generateQuestion, isCorrect ? 1200 : 1200);
+            setTimeout(() => {
+                // Re-enable input and button for the next question
+                answerInput.disabled = false;
+                submitBtn.disabled = false;
+                generateQuestion();
+            }, 1500);
         }
     }
     
